@@ -10,11 +10,64 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        String      @id @default(auto()) @map("_id") @db.ObjectId
+model User {
+    id        String    @id @default(auto()) @map("_id") @db.ObjectId
+    email     String    @unique
     name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    password  String
+    role      Role      @default(USER)
+    root      Boolean   @default(false)
+    mobile    String?
+    addresses Address[]
+    createdAt DateTime? @default(now())
+    updatedAt DateTime? @updatedAt
+}
 
-    @@index([name])
+model Address {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    postalCode   String
+    street       String
+    user         User?    @relation(fields: [userId], references: [id])
+    userId       String?  @db.ObjectId
+    province     Province @relation(fields: [provinceCode], references: [code])
+    city         City     @relation(fields: [cityCode], references: [code])
+    area         Area     @relation(fields: [areaCode], references: [code])
+    provinceCode String
+    cityCode     String
+    areaCode     String
+}
+
+model Province {
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    code String @unique
+    name String
+
+    cities  City[]
+    Address Address[]
+}
+
+model City {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    code         String   @unique
+    name         String
+    province     Province @relation(fields: [provinceCode], references: [code])
+    provinceCode String
+    areas        Area[]
+
+    Address Address[]
+}
+
+model Area {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    code     String @unique
+    name     String
+    city     City   @relation(fields: [cityCode], references: [code])
+    cityCode String
+
+    Address Address[]
+}
+
+enum Role {
+    USER
+    ADMIN
 }
