@@ -22,16 +22,16 @@ export function apiHandler(
     identity,
     schema,
     isJwt,
-  }: { identity?: Role; schema?: Schema; isJwt?: boolean },
+  }: { identity?: Role; schema?: Schema; isJwt?: boolean } = {},
 ) {
-  return async (req: NextRequest, ...args: any[]) => {
+  return async (req: NextRequest, ...args: any) => {
     try {
       if (!isPublicPath(req)) {
         await jwtMiddleware(req, isJwt);
         await identityMiddleware(req, identity, isJwt);
         await validateMiddleware(req, schema);
       }
-      const responseBody = await handler(req, args);
+      const responseBody = await handler(req, ...args);
       return NextResponse.json(responseBody ?? {});
     } catch (err: any) {
       console.log("global error handler", err);
