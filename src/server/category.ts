@@ -26,7 +26,7 @@ const getOne = async (id: string) => {
   return res;
 };
 
-const create = async (params: Category) => {
+const create = async (params: Category & { children: Category }) => {
   const category = await db.category.findUnique({
     where: {
       name: params.name,
@@ -46,7 +46,10 @@ const create = async (params: Category) => {
   return res;
 };
 
-const update = async (id: string, params: Partial<Category>) => {
+const update = async (
+  id: string,
+  params: Partial<Category & { children: Category }>,
+) => {
   const res = await db.category.update({
     where: {
       id,

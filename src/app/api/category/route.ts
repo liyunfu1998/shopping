@@ -27,7 +27,7 @@ const getCategory = apiHandler(async (req: NextRequest) => {
 
 const createCategory = apiHandler(
   async (req: NextRequest) => {
-    const body: Category = await req.json();
+    const body: Category & { children: Category } = await req.json();
     await categoryRepo.create(body);
 
     return setJson({
